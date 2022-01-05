@@ -31,7 +31,7 @@ impl HexColor {
         }
     }
 
-    pub fn output(&self) {
+    pub fn print_out(&self) {
         println!("Hex: {}", self.0.bold())
     }
 }
