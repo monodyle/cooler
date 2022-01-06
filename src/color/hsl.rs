@@ -3,7 +3,7 @@ use regex::Regex;
 
 use crate::error::Error;
 
-use super::utils::color_string_splitter;
+use super::{rgb::RGBColor, utils::color_string_splitter};
 
 #[derive(Debug)]
 pub struct HSLColor {
@@ -48,7 +48,7 @@ impl HSLColor {
                 return Err(Error::new("Can't parse HSL string"));
             }
             // saturation & lightness
-            for i in 1..2 {
+            for i in 1..=2 {
                 let mut p_str = splitter[i].trim();
                 if p_str.ends_with("%") {
                     p_str = &p_str[0..p_str.len() - 1];
