@@ -17,9 +17,14 @@ pub struct RGBColor {
 }
 
 impl RGBColor {
-    pub fn from(code: &String) -> Result<Self, Error> {
+    pub fn from(color: &String) -> Result<Self, Error> {
+        let mut color = color.trim().to_string();
+        if color.starts_with("rgb(") && color.ends_with(")") {
+            color = String::from(&color[4..color.len()-1]);
+        }
+
         let mut rgb = vec![0; 3];
-        let splitter = color_string_splitter(code);
+        let splitter = color_string_splitter(&color);
         if splitter.len() == 3 {
             for (i, value) in splitter.into_iter().enumerate() {
                 let parse = value.trim().parse::<u8>();

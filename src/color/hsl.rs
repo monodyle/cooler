@@ -20,9 +20,14 @@ pub fn is_hsl_string(color: &String) -> bool {
 }
 
 impl HSLColor {
-    pub fn from(code: &String) -> Result<Self, Error> {
+    pub fn from(color: &String) -> Result<Self, Error> {
+        let mut color = color.trim().to_string();
+        if color.starts_with("hsl(") && color.ends_with(")") {
+            color = String::from(&color[4..color.len()-1]);
+        }
+
         let mut hsl = vec![0; 3];
-        let splitter = color_string_splitter(code);
+        let splitter = color_string_splitter(&color);
         if splitter.len() == 3 {
             let pattern = Regex::new(r"^(\d+)").unwrap();
             // hue

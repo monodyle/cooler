@@ -18,9 +18,14 @@ pub struct CMYKColor {
 }
 
 impl CMYKColor {
-    pub fn from(code: &String) -> Result<Self, Error> {
+    pub fn from(color: &String) -> Result<Self, Error> {
+        let mut color = color.trim().to_string();
+        if color.starts_with("cmyk(") && color.ends_with(")") {
+            color = String::from(&color[5..color.len()-1]);
+        }
+
         let mut cmyk = vec![0; 4];
-        let splitter = color_string_splitter(code);
+        let splitter = color_string_splitter(&color);
         if splitter.len() == 4 {
             for (i, value) in splitter.into_iter().enumerate() {
                 let mut value = value;
