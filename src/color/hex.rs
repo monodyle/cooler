@@ -1,5 +1,4 @@
 use anyhow::Result;
-use colored::Colorize;
 use regex::Regex;
 
 use crate::error::Error;
@@ -19,31 +18,33 @@ pub fn is_hex_string(color: &String) -> bool {
 
 impl HexColor {
     pub fn from(color: &String) -> Result<Self, Error> {
-        let pattern = Regex::new(r"^[a-zA-Z0-9]{6}$").unwrap();
+        let mut color = color.trim().to_string();
+        if color.starts_with("#") {
+            color = String::from(&color[1..]);
+        }
+
         if color.len() == 6 {
-            if pattern.is_match(color) {
+            let pattern = Regex::new(r"^[a-zA-Z0-9]{6}$").unwrap();
+            if pattern.is_match(&color) {
                 return Ok(Self(color.to_string()));
             }
-            return Err(Error::new("Can't parse Hex string"));
         }
-        if color.len() == 7 {
-            if color.starts_with("#") {
-                let color = &color[1..];
-                if pattern.is_match(color) {
-                    return Ok(Self(color.to_string()));
-                } else {
-                    return Err(Error::new("Can't parse Hex string"));
-                }
+        if color.len() == 3 {
+            let pattern = Regex::new(r"^[a-zA-Z0-9]{3}$").unwrap();
+            if pattern.is_match(&color) {
+                let chars = &color
+                    .chars()
+                    .map(|c| c.to_string().repeat(2))
+                    .collect::<Vec<String>>()
+                    .concat();
+                return Ok(Self(chars.to_string()));
             }
-            return Err(Error::new("Can't parse Hex string"));
         }
         Err(Error::new("Can't parse Hex string"))
     }
 
-    pub fn print_out(&self) {
-        println!("Hex: #{}", self.0.bold());
-        self.to_rgb().print_out();
-        self.to_hsl().print_out();
+    pub fn print(&self) {
+        println!("Hex: #{}", self.0);
     }
 
     pub fn to_rgb(&self) -> RGBColor {
@@ -57,5 +58,11 @@ impl HexColor {
 
     pub fn to_hsl(&self) -> HSLColor {
         self.to_rgb().to_hsl()
+    }
+
+    pub fn print_others(&self) {
+        self.print();
+        self.to_rgb().print();
+        self.to_hsl().print();
     }
 }
