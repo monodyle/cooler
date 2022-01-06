@@ -17,41 +17,26 @@ pub struct RGBColor {
 impl RGBColor {
     pub fn from(code: &String) -> Result<Self, Error> {
         let mut rgb = vec![0; 3];
-        if code.contains(",") {
-            let splitter = code.trim().split(",");
-            if splitter.clone().count() == 3 {
-                for (i, value) in splitter.into_iter().enumerate() {
-                    let parse = value.trim().parse::<u8>();
-                    match parse {
-                        Ok(parse) => rgb[i] = parse,
-                        Err(_) => return Err(Error::new("Can't parse RGB string")),
-                    }
-                }
-                return Ok(Self {
-                    r: rgb[0],
-                    g: rgb[1],
-                    b: rgb[2],
-                });
-            }
-            return Err(Error::new("Can't parse RGB string"));
+        let splitter = if code.contains(",") {
+            code.trim().split(",").collect::<Vec<&str>>()
         } else {
-            let splitter = code.trim().split_ascii_whitespace();
-            if splitter.clone().count() == 3 {
-                for (i, value) in splitter.into_iter().enumerate() {
-                    let parse = value.parse::<u8>();
-                    match parse {
-                        Ok(parse) => rgb[i] = parse,
-                        Err(_) => return Err(Error::new("Can't parse RGB string")),
-                    }
+            code.trim().split_ascii_whitespace().collect::<Vec<&str>>()
+        };
+        if splitter.len() == 3 {
+            for (i, value) in splitter.into_iter().enumerate() {
+                let parse = value.trim().parse::<u8>();
+                match parse {
+                    Ok(parse) => rgb[i] = parse,
+                    Err(_) => return Err(Error::new("Can't parse RGB string")),
                 }
-                return Ok(Self {
-                    r: rgb[0],
-                    g: rgb[1],
-                    b: rgb[2],
-                });
             }
-            return Err(Error::new("Can't parse RGB string"));
+            return Ok(Self {
+                r: rgb[0],
+                g: rgb[1],
+                b: rgb[2],
+            });
         }
+        return Err(Error::new("Can't parse RGB string"));
     }
 
     pub fn print_out(&self) {
