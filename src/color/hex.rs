@@ -4,7 +4,7 @@ use regex::Regex;
 
 use crate::error::Error;
 
-use super::rgb::RGBColor;
+use super::{hsl::HSLColor, rgb::RGBColor};
 use hex::FromHex;
 
 #[derive(Debug)]
@@ -42,7 +42,8 @@ impl HexColor {
 
     pub fn print_out(&self) {
         println!("Hex: #{}", self.0.bold());
-        self.to_rgb().print_out()
+        self.to_rgb().print_out();
+        self.to_hsl().print_out();
     }
 
     pub fn to_rgb(&self) -> RGBColor {
@@ -52,5 +53,9 @@ impl HexColor {
             g: decode_hex[1],
             b: decode_hex[2],
         }
+    }
+
+    pub fn to_hsl(&self) -> HSLColor {
+        self.to_rgb().to_hsl()
     }
 }
