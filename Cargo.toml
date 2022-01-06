@@ -10,3 +10,4 @@ authors = ["monodyle <monodylh@gmail.com>"]
 regex = "1.5"
 colored = "2"
 anyhow = "1.0.52"
+hex = "0.4"

@@ -11,10 +11,10 @@ pub fn is_cmyk_string(color: &String) -> bool {
 
 #[derive(Debug)]
 pub struct CMYKColor {
-    c: u8,
-    m: u8,
-    y: u8,
-    k: u8,
+    pub c: u8,
+    pub m: u8,
+    pub y: u8,
+    pub k: u8,
 }
 
 impl CMYKColor {

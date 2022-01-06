@@ -7,9 +7,9 @@ use super::utils::color_string_splitter;
 
 #[derive(Debug)]
 pub struct HSLColor {
-    h: u16,
-    s: u8,
-    l: u8,
+    pub h: u16,
+    pub s: u8,
+    pub l: u8,
 }
 
 pub fn is_hsl_string(color: &String) -> bool {
