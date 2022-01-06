@@ -1,5 +1,7 @@
 use crate::error::Error;
 
+use super::utils::color_string_splitter;
+
 pub fn is_rgb_string(color: &String) -> bool {
     match RGBColor::from(color) {
         Ok(_) => true,
@@ -17,11 +19,7 @@ pub struct RGBColor {
 impl RGBColor {
     pub fn from(code: &String) -> Result<Self, Error> {
         let mut rgb = vec![0; 3];
-        let splitter = if code.contains(",") {
-            code.trim().split(",").collect::<Vec<&str>>()
-        } else {
-            code.trim().split_ascii_whitespace().collect::<Vec<&str>>()
-        };
+        let splitter = color_string_splitter(code);
         if splitter.len() == 3 {
             for (i, value) in splitter.into_iter().enumerate() {
                 let parse = value.trim().parse::<u8>();
@@ -40,6 +38,6 @@ impl RGBColor {
     }
 
     pub fn print_out(&self) {
-        println!("RGB: ({}, {}, {})", &self.r, &self.g, &self.b)
+        println!("RGB: {}, {}, {}", &self.r, &self.g, &self.b)
     }
 }
