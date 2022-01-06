@@ -1,6 +1,7 @@
 use crate::error::Error;
 
-use super::{hsl::HSLColor, utils::color_string_splitter};
+use hex::encode;
+use super::{hsl::HSLColor, utils::color_string_splitter, hex::HexColor};
 
 pub fn is_rgb_string(color: &String) -> bool {
     match RGBColor::from(color) {
@@ -42,9 +43,8 @@ impl RGBColor {
         return Err(Error::new("Can't parse RGB string"));
     }
 
-    pub fn print_out(&self) {
+    pub fn print(&self) {
         println!("RGB: {}, {}, {}", &self.r, &self.g, &self.b);
-        self.to_hsl().print_out();
     }
 
     pub fn to_hsl(&self) -> HSLColor {
@@ -84,5 +84,16 @@ impl RGBColor {
         l = l * 100.0;
 
         HSLColor { h: h as u16, s, l }
+    }
+
+    pub fn to_hex(&self) -> HexColor {
+        let hex = hex::encode(vec![self.r, self.g, self.b]);
+        HexColor::from(&hex).unwrap()
+    }
+
+    pub fn print_others(&self) {
+        self.print();
+        self.to_hsl().print();
+        self.to_hex().print();
     }
 }

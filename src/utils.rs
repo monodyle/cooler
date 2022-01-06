@@ -4,13 +4,13 @@ use crate::{color::{hex::{is_hex_string, HexColor}, rgb::{is_rgb_string, RGBColo
 
 pub fn check_command(color: &String) -> Result<(), Error> {
     if is_hex_string(color) {
-        HexColor::from(color)?.print_out()
+        HexColor::from(color)?.print_others()
     } else if is_rgb_string(color) {
-        RGBColor::from(color)?.print_out()
+        RGBColor::from(color)?.print_others()
     } else if is_hsl_string(color) {
-        HSLColor::from(color)?.print_out()
+        HSLColor::from(color)?.print_others()
     } else if is_cmyk_string(color) {
-        CMYKColor::from(color)?.print_out()
+        CMYKColor::from(color)?.print_others()
     } else {
         println!("Invalid color string");
     }

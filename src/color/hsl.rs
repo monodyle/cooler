@@ -73,7 +73,11 @@ impl HSLColor {
         return Err(Error::new("Can't parse HSL string"));
     }
 
-    pub fn print_out(&self) {
+    pub fn print(&self) {
         println!("HSL: {}°, {:.0}%, {:.0}%", &self.h, &self.s, &self.l)
+    }
+
+    pub fn print_others(&self) {
+        self.print();
     }
 }

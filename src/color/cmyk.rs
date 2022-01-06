@@ -54,10 +54,14 @@ impl CMYKColor {
         return Err(Error::new("Can't parse CMYK string"));
     }
 
-    pub fn print_out(&self) {
+    pub fn print(&self) {
         println!(
             "CMYK: {}%, {}%, {}%, {}%",
             &self.c, &self.m, &self.y, &self.k
         )
+    }
+
+    pub fn print_others(&self) {
+        self.print();
     }
 }
