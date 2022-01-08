@@ -1,6 +1,5 @@
 use crate::error::Error;
 
-use hex::encode;
 use super::{hsl::HSLColor, utils::color_string_splitter, hex::HexColor};
 
 pub fn is_rgb_string(color: &String) -> bool {
