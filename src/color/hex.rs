@@ -3,7 +3,7 @@ use regex::Regex;
 
 use crate::error::Error;
 
-use super::{hsl::HSLColor, rgb::RGBColor};
+use super::{hsl::HSLColor, rgb::RGBColor, cmyk::CMYKColor};
 use hex::FromHex;
 
 #[derive(Debug)]
@@ -60,9 +60,14 @@ impl HexColor {
         self.to_rgb().to_hsl()
     }
 
+    pub fn to_cmyk(&self) -> CMYKColor {
+        self.to_rgb().to_cmyk()
+    }
+
     pub fn print_others(&self) {
         self.print();
         self.to_rgb().print();
         self.to_hsl().print();
+        self.to_cmyk().print();
     }
 }

@@ -3,7 +3,7 @@ use regex::Regex;
 
 use crate::error::Error;
 
-use super::{rgb::RGBColor, utils::color_string_splitter, hex::HexColor};
+use super::{rgb::RGBColor, utils::color_string_splitter, hex::HexColor, cmyk::CMYKColor};
 
 #[derive(Debug)]
 pub struct HSLColor {
@@ -125,9 +125,14 @@ impl HSLColor {
         self.to_rgb().to_hex()
     }
 
+    pub fn to_cmyk(&self) -> CMYKColor {
+        self.to_rgb().to_cmyk()
+    }
+
     pub fn print_others(&self) {
         self.print();
         self.to_hex().print();
         self.to_rgb().print();
+        self.to_cmyk().print();
     }
 }
