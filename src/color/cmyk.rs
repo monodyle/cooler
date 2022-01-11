@@ -1,6 +1,6 @@
 use crate::error::Error;
 
-use super::utils::color_string_splitter;
+use super::{rgb::RGBColor, utils::color_string_splitter, hex::HexColor, hsl::HSLColor};
 
 pub fn is_cmyk_string(color: &String) -> bool {
     match CMYKColor::from(color) {
@@ -21,7 +21,7 @@ impl CMYKColor {
     pub fn from(color: &String) -> Result<Self, Error> {
         let mut color = color.trim().to_string();
         if color.starts_with("cmyk(") && color.ends_with(")") {
-            color = String::from(&color[5..color.len()-1]);
+            color = String::from(&color[5..color.len() - 1]);
         }
 
         let mut cmyk = vec![0; 4];
@@ -61,7 +61,26 @@ impl CMYKColor {
         )
     }
 
+    pub fn to_rgb(&self) -> RGBColor {
+        let (c, m, y, k) = (self.c as f64, self.m as f64, self.y as f64, self.k as f64);
+        let r = 255.0 * (1.0 - c) * (1.0 - k);
+        let g = 255.0 * (1.0 - m) * (1.0 - k);
+        let b = 255.0 * (1.0 - y) * (1.0 - k);
+        RGBColor { r: r as u8, g: g as u8, b: b as u8 }
+    }
+
+    pub fn to_hex(&self) -> HexColor {
+        self.to_rgb().to_hex()
+    }
+
+    pub fn to_hsl(&self) -> HSLColor {
+        self.to_rgb().to_hsl()
+    }
+
     pub fn print_others(&self) {
         self.print();
+        self.to_hex().print();
+        self.to_rgb().print();
+        self.to_hsl().print();
     }
 }
