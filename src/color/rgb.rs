@@ -1,6 +1,6 @@
 use crate::error::Error;
 
-use super::{hsl::HSLColor, utils::color_string_splitter, hex::HexColor};
+use super::{cmyk::CMYKColor, hex::HexColor, hsl::HSLColor, utils::color_string_splitter};
 
 pub fn is_rgb_string(color: &String) -> bool {
     match RGBColor::from(color) {
@@ -56,7 +56,7 @@ impl RGBColor {
         let cmax = f64::max(f64::max(r, g), b);
         let delta = cmax - cmin;
 
-        let (mut h, mut s, mut l): (f64, f64, f64) = (0.0, 0.0, 0.0);
+        let (mut h, mut s, mut l): (f64, f64, f64);
 
         if delta == 0.0 {
             h = 0.0;
@@ -90,9 +90,39 @@ impl RGBColor {
         HexColor::from(&hex).unwrap()
     }
 
+    pub fn to_cmyk(&self) -> CMYKColor {
+        let (r, g, b) = (self.r, self.g, self.b);
+        if r == 0 && g == 0 && b == 0 {
+            return CMYKColor {
+                c: 0,
+                m: 0,
+                y: 0,
+                k: 100,
+            };
+        }
+
+        let (mut c, mut m, mut y) = (
+            1.0 - (r as f64 / 255.0),
+            1.0 - (g as f64 / 255.0),
+            1.0 - (b as f64 / 255.0),
+        );
+        let k = f64::min(c, f64::min(m, y));
+        c = (c - k) / (1.0 - k);
+        m = (m - k) / (1.0 - k);
+        y = (y - k) / (1.0 - k);
+
+        return CMYKColor {
+            c: (c * 100.0) as u8,
+            m: (m * 100.0) as u8,
+            y: (y * 100.0) as u8,
+            k: (k * 100.0) as u8,
+        };
+    }
+
     pub fn print_others(&self) {
         self.print();
         self.to_hsl().print();
         self.to_hex().print();
+        self.to_cmyk().print();
     }
 }

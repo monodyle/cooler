@@ -28,7 +28,8 @@ impl HSLColor {
 
         let splitter = color_string_splitter(&color);
         if splitter.len() == 3 {
-            let (mut h, mut s, mut l): (u16, f64, f64) = (0, 0.0, 0.0);
+            let h;
+            let (mut s, mut l) = (0.0, 0.0);
             let pattern = Regex::new(r"^(\d+)").unwrap();
             // hue
             let hue_str = splitter[0].trim();
