@@ -46,6 +46,7 @@ dependencies = [
  "anyhow",
  "colored",
  "hex",
+ "lazy_static",
  "regex",
 ]
 
