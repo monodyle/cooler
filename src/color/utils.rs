@@ -20,7 +20,7 @@ pub fn hex_to_u8(value: String) -> Result<u8, Error> {
     } else {
         return Err(Error::new("Cannot read hex value"))
     };
-    let result = hex::decode(value.repeat(2));
+    let result = hex::decode(value);
     match result {
         Ok(result) => {
             Ok(result[0])
