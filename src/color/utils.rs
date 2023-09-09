@@ -12,11 +12,11 @@ pub fn safe_value<T>(low: T, high: T, value: T) -> T
 where
     T: PartialOrd + Copy,
 {
-    let min_value = if low > value { value } else { low };
-    if high < min_value {
-        high
+    let min = if low < value { value } else { low };
+    if high > min {
+        min
     } else {
-        min_value
+        high
     }
 }
 

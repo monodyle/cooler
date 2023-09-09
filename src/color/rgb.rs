@@ -3,7 +3,7 @@ use regex::Regex;
 
 use crate::{color::utils, error::Error};
 
-use super::utils::safe_value;
+use super::{hsl::HSLColor, utils::safe_value};
 
 #[derive(Debug, PartialEq, PartialOrd)]
 pub struct RGBColor {
@@ -20,7 +20,11 @@ lazy_static! {
         Regex::new("^#(?P<r>[a-f0-9]{2})(?P<g>[a-f0-9]{2})(?P<b>[a-f0-9]{2})(?P<a>[a-f0-9]{2})?$")
             .unwrap();
     static ref RGB_RE: Regex = Regex::new(
-        r"^rgba?\(\s*(?P<r>\d+)\s*,\s*(?P<g>\d+)\s*,\s*(?P<b>\d+)\s*(?:,\s*(?P<a>[\d.]+))?\s*\)$"
+        r"^(?i:rgba?)\(\s*(?P<r>\d+)\s*,\s*(?P<g>\d+)\s*,\s*(?P<b>\d+)\s*(?:,\s*(?P<a>[\d.]+))?\s*\)$"
+    )
+    .unwrap();
+    static ref HSL_RE: Regex = Regex::new(
+        r"^(?i:hsla?)\(\s*(?P<h>[\d.]+)\s*,\s*(?P<s>[\d.]+)%\s*,\s*(?P<l>[\d.]+)%(?:\s*,\s*(?P<a>[\d.]+))?\s*\)$"
     )
     .unwrap();
 }
@@ -33,6 +37,45 @@ impl RGBColor {
             b: safe_value(0, 255, b),
             a: safe_value(0.0, 1.0, a.unwrap_or(1.0)),
         }
+    }
+
+    pub fn to_hsl(&self) -> HSLColor {
+        let (r, g, b) = (
+            self.r as f64 / 255.0,
+            self.g as f64 / 255.0,
+            self.b as f64 / 255.0,
+        );
+        let cmin = f64::min(f64::min(r, g), b);
+        let cmax = f64::max(f64::max(r, g), b);
+        let delta = cmax - cmin;
+
+        let (mut h, mut s, mut l): (f64, f64, f64);
+
+        if delta == 0.0 {
+            h = 0.0;
+        } else if cmax == r {
+            h = ((g - b) as f64 / delta as f64) % 6.0;
+        } else if cmax == g {
+            h = (b - r) as f64 / delta as f64 + 2.0;
+        } else {
+            h = (r - g) as f64 / delta as f64 + 4.0;
+        }
+        h = (h * 60.0).ceil();
+        if h < 0.0 {
+            h += 360.0
+        }
+
+        l = (cmax + cmin) as f64 / 2.0;
+        s = if delta == 0.0 {
+            0.0
+        } else {
+            delta as f64 / (1.0 - f64::abs(2.0 * l - 1.0))
+        };
+
+        s = (s * 100.0).ceil();
+        l = (l * 100.0).ceil();
+
+        HSLColor { h: h as u16, s: s as u8, l: l as u8, a: self.a }
     }
 
     pub fn parse(color: &String) -> Result<Self, Error> {
@@ -109,7 +152,39 @@ impl RGBColor {
             });
         }
 
-        return Err(Error::new("Invalid color string"));
+        if HSL_RE.is_match(&color) {
+            let Some(values) = HSL_RE.captures(&color) else {
+                return Err(Error::new("Invalid color string"))
+            };
+            let extracted_alpha = values.name("a");
+
+            let alpha = if extracted_alpha.is_some() {
+                values["a"]
+                    .parse::<f32>()
+                    .or(Err(Error::new("Invalid color string")))?
+            } else {
+                1.0
+            };
+
+            let h = values["h"]
+                .parse::<u16>()
+                .or(Err(Error::new("Invalid color string")))?;
+            let s = values["s"]
+                .parse::<u8>()
+                .or(Err(Error::new("Invalid color string")))?;
+            let l = values["l"]
+                .parse::<u8>()
+                .or(Err(Error::new("Invalid color string")))?;
+
+            if safe_value(0, 100, s) != s || safe_value(0, 100, l) != l {
+                return Err(Error::new("Invalid color string"));
+            }
+
+            let hsl = HSLColor::new(h, s, l, Some(alpha));
+            return Ok(hsl.to_rgb());
+        }
+
+        Err(Error::new("Invalid color string"))
     }
 
     pub fn set_alpha(&mut self, alpha: f32) {
@@ -117,7 +192,7 @@ impl RGBColor {
     }
 
     pub fn is_rgb_string(color: &String) -> bool {
-        match RGBColor::parse(color) {
+        match Self::parse(color) {
             Ok(_) => true,
             Err(_) => false,
         }
@@ -242,5 +317,16 @@ mod tests {
                 a: 0.0
             }
         );
+    }
+
+    #[test]
+    fn hsl_string() {
+        assert_eq!(RGBColor::parse(&String::from("hsl(136, 32%, 62%)")).unwrap(),
+        RGBColor {
+            r: 127,
+            g: 189,
+            b: 144,
+            a: 1.0
+        })
     }
 }
