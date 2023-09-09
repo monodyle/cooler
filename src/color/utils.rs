@@ -8,8 +8,16 @@ pub fn color_string_splitter(color: &String) -> Vec<&str> {
     }
 }
 
-pub fn safe_value(min: usize, max: usize, value: usize) -> usize {
-    std::cmp::min(max, std::cmp::max(min, value))
+pub fn safe_value<T>(low: T, high: T, value: T) -> T
+where
+    T: PartialOrd + Copy,
+{
+    let min_value = if low > value { value } else { low };
+    if high < min_value {
+        high
+    } else {
+        min_value
+    }
 }
 
 pub fn hex_to_u8(value: String) -> Result<u8, Error> {
@@ -18,15 +26,11 @@ pub fn hex_to_u8(value: String) -> Result<u8, Error> {
     } else if value.len() == 1 {
         value.repeat(2)
     } else {
-        return Err(Error::new("Cannot read hex value"))
+        return Err(Error::new("Cannot read hex value"));
     };
     let result = hex::decode(value);
     match result {
-        Ok(result) => {
-            Ok(result[0])
-        },
-        Err(_) => {
-            Err(Error::new("Cannot decode hex value"))
-        }
+        Ok(result) => Ok(result[0]),
+        Err(_) => Err(Error::new("Cannot decode hex value")),
     }
 }
